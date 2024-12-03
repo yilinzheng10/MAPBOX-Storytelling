@@ -264,28 +264,69 @@ map.on("load", function () {
       },
     },
   );
-  map.addLayer(
-    { 
-      id: "flood",
-      type: "fill",
-      source: {
-        type: "geojson",
-        data: "data/floodLevels.geojson",
-      },
-      filter: ['all', ['!=', ['get', 'fld_zone'], null]],
-      paint: {
-        "fill-opacity": 1,
-        "fill-color": [
-          "match",
-          ["get", "fld_zone"],
-          "AE", "#b3d9ff",       // Light blue for 1-percent-annual chance floodplains
-          "AO", "#66b2ff",       // Medium blue for sheet-flow shallow flooding < 3ft
-          "VE", "#004080",       // Dark blue for coastal high hazard areas
-          "rgba(255, 255, 255, 0)"  // Fully transparent if no match
-        ],
-      },
+},)
+
+// Wait for the Map to Load
+map.on("load", () => {
+  console.log("Map is loaded.");
+
+// Add Layers Dynamically Based on Chapters
+config.chapters.forEach((chapter) => {
+  // Check for Flood Layer
+  if (chapter.onChapterEnter.some((entry) => entry.layer === "flood")) {
+    if (!map.getLayer("flood")) {
+      map.addLayer({
+        id: "flood",
+        type: "fill",
+        source: {
+          type: "geojson",
+          data: "data/floodLevels.geojson",
+        },
+        paint: {
+          "fill-color": [
+            "match",
+            ["get", "fld_zone"],
+            "AE", "#b3d9ff", // Light blue
+            "AO", "#66b2ff", // Medium blue
+            "VE", "#004080", // Dark blue
+            "rgba(255, 255, 255, 0)", // Transparent
+          ],
+          "fill-opacity": 0,
+        },
+      });
+    }
+  }
+
+  // Check for Contour Layer
+  if (map.getLayer("contour")) {
+    map.removeLayer("contour");
+    map.removeSource("contour");
+  }
+  
+  map.addLayer({
+    id: "contour",
+    type: "line",
+    source: {
+      type: "geojson",
+      data: "data/cleaned_contour_NYC_2ft.geojson",
     },
-  );
+    paint: {
+      "line-color": [
+        "interpolate",
+        ["linear"],
+        ["to-number", ["get", "ELEVATION"]],
+        -2, "#0000FF",   // Deep Blue for -2 ft
+        0, "#0033FF",    // Darker Blue for 0 ft
+        2, "#3366FF",    // Mid Blue for 2 ft
+        6, "#DAA06D",    // Light Blue for 6 ft
+        10, "#FF5F1F",   
+        20, "#FF5F1F"    
+      ],
+      "line-width": 1, // Adjust for visibility
+      "line-opacity": 0.5,
+    },
+  });
+
 
   // Setup the instance, pass callback functions
   scroller
@@ -346,4 +387,4 @@ map.on("load", function () {
 
 /* Here we watch for any resizing of the screen to
 adjust our scrolling setup */
-window.addEventListener("resize", scroller.resize);
+window.addEventListener("resize", scroller.resize);})

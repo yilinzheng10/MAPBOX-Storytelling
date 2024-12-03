@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Contour Layer Debug</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoicXVpeWlsIiwiYSI6ImNsemoxNHlhMTBsa2UyaXByd3pvcjM4ZjgifQ.JTxA-uHyVmgrVrRoNJiAyA';
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/light-v10',
+      center: [-74.01262238395982, 40.676459721525134],
+      zoom: 12,
+    });
+
+    map.on('load', () => {
+      console.log("Map loaded.");
+
+      fetch('data/reprojected_contour.geojson')
+        .then(response => response.json())
+        .then(data => {
+          map.addLayer({
+            id: "contour",
+            type: "line",
+            source: {
+              type: "geojson",
+              data: data,
+            },
+            paint: {
+              "line-color": "blue",
+              "line-width": 2,
+              "line-opacity": 1,
+            },
+          });
+          console.log("Contour layer added.");
+        })
+        .catch(error => console.error("Error loading GeoJSON:", error));
+    });
+  </script>
+</body>
+</html>
