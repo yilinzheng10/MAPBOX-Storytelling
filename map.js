@@ -196,6 +196,76 @@ scrolling to the chapters and move the map from one location to another
 while changing the zoom level, pitch and bearing */
 
 map.on("load", function () {
+  // Add legend container
+  const legendContainer = document.createElement('div');
+  legendContainer.className = 'legend-container';
+  document.getElementById('map').appendChild(legendContainer);
+
+  // Sale Price Legend
+  const salePriceLegend = document.createElement('div');
+  salePriceLegend.className = 'legend';
+  salePriceLegend.innerHTML = `
+    <h4>Sale Price</h4>
+    <div class="legend-item">
+      <span style="background: rgba(139, 0, 0, 0.75)"></span>$1 - $170,000
+    </div>
+    <div class="legend-item">
+      <span style="background: #FF6347"></span>$170,001 - $317,000
+    </div>
+    <div class="legend-item">
+      <span style="background: #FFA07A"></span>$317,001 - $399,000
+    </div>
+    <div class="legend-item">
+      <span style="background: #FFD700"></span>$399,001 - $453,000
+    </div>
+    <div class="legend-item">
+      <span style="background: #FFFFE0"></span>$453,001 - $500,000
+    </div>
+  `;
+
+  // Flood Zones Legend
+  const floodLegend = document.createElement('div');
+  floodLegend.className = 'legend';
+  floodLegend.innerHTML = `
+    <h4>Flood Zones</h4>
+    <div class="legend-item">
+      <span style="background: #b3d9ff"></span>AE Zone
+    </div>
+    <div class="legend-item">
+      <span style="background: #66b2ff"></span>AO Zone
+    </div>
+    <div class="legend-item">
+      <span style="background: #004080"></span>VE Zone
+    </div>
+  `;
+
+  // Contour Lines Legend
+  const contourLegend = document.createElement('div');
+  contourLegend.className = 'legend';
+  contourLegend.innerHTML = `
+    <h4>Elevation (ft)</h4>
+    <div class="legend-item">
+      <span style="background: #0000FF"></span>-2 ft
+    </div>
+    <div class="legend-item">
+      <span style="background: #0033FF"></span>0 ft
+    </div>
+    <div class="legend-item">
+      <span style="background: #3366FF"></span>2 ft
+    </div>
+    <div class="legend-item">
+      <span style="background: #DAA06D"></span>6 ft
+    </div>
+    <div class="legend-item">
+      <span style="background: #FF5F1F"></span>10+ ft
+    </div>
+  `;
+
+  // Add legends to container
+  legendContainer.appendChild(salePriceLegend);
+  legendContainer.appendChild(floodLegend);
+  legendContainer.appendChild(contourLegend);
+
   // Add 3d terrain if necessary
   if (config.use3dTerrain) {
     map.addSource("mapbox-dem", {
@@ -322,7 +392,7 @@ config.chapters.forEach((chapter) => {
         10, "#FF5F1F",   
         20, "#FF5F1F"    
       ],
-      "line-width": 1, // Adjust for visibility
+      "line-width": 0.5, // Changed from 1 to 0.5 for thinner lines
       "line-opacity": 0.5,
     },
   });
@@ -340,6 +410,26 @@ config.chapters.forEach((chapter) => {
         (chap) => chap.id === response.element.id
       );
       response.element.classList.add("active");
+      
+      // Add this code to handle legend visibility and position
+      const legendContainer = document.querySelector('.legend-container');
+      
+      // Hide legend for chapters 1, 2, and 6
+      if (chapter.id === 'overallMap' || chapter.id === 'flood' || chapter.id === 'conclusion') {
+        legendContainer.style.display = 'none';
+      } else {
+        legendContainer.style.display = 'block';
+        
+        // Position legend on the left for arverne chapter
+        if (chapter.id === 'arverne') {
+          legendContainer.style.right = 'auto';
+          legendContainer.style.left = '20px';
+        } else {
+          legendContainer.style.left = 'auto';
+          legendContainer.style.right = '20px';
+        }
+      }
+
       let thisZoom;
       if (smallMedia) {
         thisZoom = chapter.location.zoomSmall;
