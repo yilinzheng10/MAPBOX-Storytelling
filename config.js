@@ -51,7 +51,7 @@ let divChapter6 =
   
   var config = {
     style: "mapbox://styles/quiyil/cm2m8fdnz001x01qj75tm3xod",
-    accessToken: "pk.eyJ1IjoicXVpeWlsIiwiYSI6ImNsemoxNHlhMTBsa2UyaXByd3pvcjM4ZjgifQ.JTxA-uHyVmgrVrRoNJiAyA",
+    accessToken: "pk.eyJ1IjoicXVpeWlsIiwiYSI6ImNtaW54eG84bjJpcXYzZnB4NzU3dXRvb3QifQ.w8s1zXPc4YabVz9d6tjtgg",
     showMarkers: false,
     markerColor: "#3FB1CE",
     theme: "light",
